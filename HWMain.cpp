@@ -69,11 +69,36 @@ double NewtonMain(double x1){
 
 }
 
+double SCantMain(double x1, double x0){
+    /* */
+    double x2 = 0.0;
+
+    double e = .0000001;
+    double maxI = 5000;
+    double ans = 0;
+    for(int i = 0; i<maxI; i++) {
+        x2 = x1 - ((x1-x0)*((fFunction(x1))/(fFunction(x1)-fFunction(x0))));
+        x0 = x1;
+        x1 = x2;
+        if(pow(pow(fFunction(x1),2),.5) < e ) {
+            ans = x1;
+            break;
+        }
+    }
+    std::cout << x1 << std::endl;
+    return(ans);
+
+
+}
+
+
 
 int main() {
     double answer = 0;
     answer = BisectionMain(0,1);
     double answer1 = 0;
     answer1 = NewtonMain(.4);
+    double answer3 = 0;
+    answer3 = SCantMain(0,1);
  
 }
