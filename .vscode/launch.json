@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/nicol/OneDrive/Documents/AMS 326/AMS326",
-      "program": "c:/Users/nicol/OneDrive/Documents/AMS 326/AMS326/build/Debug/outDebug",
+      "cwd": "c:/Users/nicol/OneDrive/Documents/AMS_326/AMS326",
+      "program": "C:/Users/nicol/OneDrive/Documents/AMS_326/AMS326/HWMain.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
