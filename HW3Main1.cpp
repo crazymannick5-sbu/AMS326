@@ -11,7 +11,7 @@ double yBig = .7693;
 double zeroError = .00001;
 int number = 0;
 double pi = 3.14159265359;
-int sampleSize = 10000;
+int sampleSize = 1000;
 
 void showProgressBar(int progress, int total) {
     const int barWidth = 50;
@@ -263,6 +263,6 @@ int main() {
     cout << "Checking: " << ans << endl;
     int ans1 = ReCheck(0,-.2,-.54,-.5,0);
     cout << "Rect Checking: " << ans1 << endl;
-    double area = AreaFunction(-.9,.7,.5);
+    double area = AreaFunction(0,0,0);
     cout << "area calculation: " << area << endl;
 }
