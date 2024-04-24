@@ -12,6 +12,7 @@ double zeroError = .00001;
 int number = 0;
 double pi = 3.14159265359;
 int sampleSize = 1000;
+int sampleSize2= 1000;
 
 void showProgressBar(int progress, int total) {
     const int barWidth = 50;
@@ -45,7 +46,6 @@ void showProgressBar2(double progress, double total) {
     std::cout << "] " << int(percentage * 100.0) << "%\r";
     std::cout.flush();
 }
-
 double randomDoubleBetween(double min, double max) {
     std::random_device rd; // Obtain a random seed from the OS entropy device
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
@@ -53,7 +53,6 @@ double randomDoubleBetween(double min, double max) {
 
     return dis(gen);
 }
-
 double fLxy(double x, double y) {
     double answer = 0;
     answer = pow((pow(x,2)+pow(y,2)),3)-(4*pow(x,2)*pow(y,2));
@@ -185,7 +184,6 @@ double *fLy(double x) {
     
     return(answer);
 }
-
 int cloverCheck(double x, double y) {
     bool answer = 0;
     double* outputs = fLy(x);
@@ -205,7 +203,6 @@ int cloverCheck(double x, double y) {
     return(answer);
 
 }
-
 int ReCheck(double y1, double x1, double H, double x, double y ) {
     int ans = 0;
     double ya = tan(H)*(x-x1) + (.5/cos(H)) + (y1);
@@ -237,7 +234,6 @@ int ReCheck(double y1, double x1, double H, double x, double y ) {
 
     return(ans);
 }
-
 int BothCheck(double x, double y, double y1, double x1, double H) {
     int ans = 0;
     if (cloverCheck(x,y)==1 && ReCheck(y1,x1,H,x,y)==1) {
@@ -245,7 +241,6 @@ int BothCheck(double x, double y, double y1, double x1, double H) {
     }
     return(ans);
 }
-
 double AreaFunction(double x1, double y1, double H) {
     double i = 0;
     double area = 0;
@@ -262,7 +257,6 @@ double AreaFunction(double x1, double y1, double H) {
     area = areaWhole * areaRatio;
     return(area);
 }
-
 double HdAreaFunction(double x1, double y1, double Hi) {
     double answer = 0;
     answer = (AreaFunction(x1,y1,(Hi+h))-AreaFunction(x1,y1,(Hi-h)))/(2*h);
@@ -278,7 +272,6 @@ double YdAreaFunction(double x1, double yi, double H) {
     answer = (AreaFunction(x1,(yi+h),H)-AreaFunction(x1,(yi-h),H))/(2*h);
     return(answer);
 }
-
 void gradientReturn() {
     double xn = -1;
     double yn = 1;
@@ -320,6 +313,55 @@ void gradientReturn() {
     }
     cout << "gradientReturn: "  <<outputn << endl;
 }
+
+double CentDet(double L, double w, double d, double cent) {
+    double center = randomDoubleBetween(0,w);
+    double sum = -1*center+w;
+    int answer = 0;
+    while(sum<= d) {
+        answer = answer + 1; 
+        sum = sum+w;
+    }
+    return(answer);
+}
+
+
+
+std::vector<std::vector<double>> ProbDetermine(double L, double w, double d) {
+    double center = randomDoubleBetween(0,w);
+    double max = 0;
+    std::vector<double> ref;
+    std::vector<double> count;
+    std::vector<std::vector<double>> answer;
+    
+    if(d<=1.0) {
+        max = 1;
+    } else {
+        if(static_cast<double>(static_cast<int>(d/w))-(d/w) != 0 ) {
+            max = 1 + static_cast<int>(d/w);
+        } else {
+            max = static_cast<int>(d/w);
+        }
+    }
+    for(int i = 0; i<=max, i++) {
+        count.push_back(0);
+        ref.push_back(i+1);
+    }
+    for(int i = 0; i<sampleSize2, i++) {
+        center = randomDoubleBetween(0,w);
+        double aN = CentDet(L,w,d,center);
+        count[std::round(aN)] = count[std::round(aN)] + 1; 
+    }
+    for(int i = 0; i<=max, i++) {
+        count[i] = count[i] / sampleSize2;
+    }
+    answer.push_back(ref);
+    answer.push_back(count);
+    return(answer);     
+     
+}
+
+
 
 
 int main() {
