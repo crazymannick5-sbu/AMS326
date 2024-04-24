@@ -29,6 +29,22 @@ void showProgressBar(int progress, int total) {
     std::cout << "] " << int(percentage * 100.0) << "%\r";
     std::cout.flush();
 }
+void showProgressBar2(double progress, double total) {
+    const int barWidth = 50;
+
+    float percentage = (float)progress / total;
+    int numBars = barWidth * percentage;
+
+    std::cout << "[";
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < numBars)
+            std::cout << "=";
+        else
+            std::cout << " ";
+    }
+    std::cout << "] " << int(percentage * 100.0) << "%\r";
+    std::cout.flush();
+}
 
 double randomDoubleBetween(double min, double max) {
     std::random_device rd; // Obtain a random seed from the OS entropy device
@@ -240,11 +256,69 @@ double AreaFunction(double x1, double y1, double H) {
         double x = randomDoubleBetween(-1*xBig,xBig);
         double y = randomDoubleBetween(-1*yBig,yBig);
         yesSum = yesSum + BothCheck(x,y,y1,x1,H);
-        showProgressBar(i,sampleSize);
+        //showProgressBar(i,sampleSize);
     }
     areaRatio = yesSum/i;
     area = areaWhole * areaRatio;
     return(area);
+}
+
+double HdAreaFunction(double x1, double y1, double Hi) {
+    double answer = 0;
+    answer = (AreaFunction(x1,y1,(Hi+h))-AreaFunction(x1,y1,(Hi-h)))/(2*h);
+    return(answer);
+}
+double XdAreaFunction(double xi, double y1, double H) {
+    double answer = 0;
+    answer = (AreaFunction((xi+h),y1,H)-AreaFunction((xi-h),y1,H))/(2*h);
+    return(answer);
+}
+double YdAreaFunction(double x1, double yi, double H) {
+    double answer = 0;
+    answer = (AreaFunction(x1,(yi+h),H)-AreaFunction(x1,(yi-h),H))/(2*h);
+    return(answer);
+}
+
+void gradientReturn() {
+    double xn = -1;
+    double yn = 1;
+    double Hn = 0;
+    double output0 = AreaFunction(xn,yn,Hn);
+    double outputn = 0;
+    double currentStepFactor = 1.0;
+    double max = 1/(pow(2,.5));
+    double factor = 0;
+    
+    double Hdg = HdAreaFunction(xn,yn,Hn);
+    double Xdg = XdAreaFunction(xn,yn,Hn);
+    double Ydg = YdAreaFunction(xn,yn,Hn);
+    double Hdgn = 0;
+    double Xdgn = 0;
+    double Ydgn = 0;
+    
+    cout << "start" << endl;
+    int dec = 1;
+    while(outputn <= .75*max) {
+        outputn = AreaFunction(xn,yn,Hn);
+        Hdgn = HdAreaFunction(xn,yn,Hn);
+        Xdgn = XdAreaFunction(xn,yn,Hn);
+        Ydgn = YdAreaFunction(xn,yn,Hn);
+        factor = (max - outputn)/max;
+        xn = xn + factor*Xdgn;
+        yn = yn + factor*Ydgn;
+        Hn = Hn + factor*Hdgn;
+
+        //showProgressBar2(outputn, .707106);
+        cout << "area: " << outputn <<  endl;  
+        cout << "   Hdgn: " << Hdgn << endl;
+        cout << "   Xdgn: " << Xdgn << endl;
+        cout << "   Ydgn: " << Ydgn << endl;
+
+        
+        
+        
+    }
+    cout << "gradientReturn: "  <<outputn << endl;
 }
 
 
@@ -263,6 +337,7 @@ int main() {
     cout << "Checking: " << ans << endl;
     int ans1 = ReCheck(0,-.2,-.54,-.5,0);
     cout << "Rect Checking: " << ans1 << endl;
-    double area = AreaFunction(0,0,0);
-    cout << "area calculation: " << area << endl;
+    //double area = AreaFunction(-1,1,-1.570696);
+    //cout << "area calculation: " << area << endl;
+    gradientReturn();
 }
