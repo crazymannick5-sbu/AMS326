@@ -12,7 +12,7 @@ double zeroError = .00001;
 int number = 0;
 double pi = 3.14159265359;
 int sampleSize = 1000;
-int sampleSize2= 1000;
+int sampleSize2= 100000;
 
 void showProgressBar(int progress, int total) {
     const int barWidth = 50;
@@ -325,7 +325,35 @@ double CentDet(double L, double w, double d, double cent) {
     return(answer);
 }
 
+void printVectorOfVectors(const std::vector<std::vector<double>>& vec) {
+    // Determine the maximum size of the inner vectors
+    size_t maxInnerSize = 0;
+    for (const auto& innerVec : vec) {
+        if (innerVec.size() > maxInnerSize) {
+            maxInnerSize = innerVec.size();
+        }
+    }
 
+    // Print header row with column indices
+    std::cout << "  ";
+    for (size_t i = 0; i < maxInnerSize; ++i) {
+        std::cout << i << "\t";
+    }
+    std::cout << std::endl;
+
+    // Print each inner vector in tabulated form
+    for (size_t row = 0; row < vec.size(); ++row) {
+        std::cout << row << " ";
+        for (size_t col = 0; col < vec[row].size(); ++col) {
+            std::cout << vec[row][col] << "\t";
+        }
+        // Pad with empty cells if necessary
+        for (size_t i = vec[row].size(); i < maxInnerSize; ++i) {
+            std::cout << "\t";
+        }
+        std::cout << std::endl;
+    }
+}
 
 std::vector<std::vector<double>> ProbDetermine(double L, double w, double d) {
     double center = randomDoubleBetween(0,w);
@@ -334,7 +362,7 @@ std::vector<std::vector<double>> ProbDetermine(double L, double w, double d) {
     std::vector<double> count;
     std::vector<std::vector<double>> answer;
     
-    if(d<=1.0) {
+    if(d/w<=1.0) {
         max = 1;
     } else {
         if(static_cast<double>(static_cast<int>(d/w))-(d/w) != 0 ) {
@@ -343,17 +371,20 @@ std::vector<std::vector<double>> ProbDetermine(double L, double w, double d) {
             max = static_cast<int>(d/w);
         }
     }
-    for(int i = 0; i<=max, i++) {
+    for(int i = 0; i<=max; i++) {
         count.push_back(0);
         ref.push_back(i+1);
     }
-    for(int i = 0; i<sampleSize2, i++) {
+    for(int i = 0; i<sampleSize2; i++) {
         center = randomDoubleBetween(0,w);
         double aN = CentDet(L,w,d,center);
         count[std::round(aN)] = count[std::round(aN)] + 1; 
     }
-    for(int i = 0; i<=max, i++) {
+    cout << "max " << max << endl;
+    for(int i = 0; i<=max; i++) {
+        
         count[i] = count[i] / sampleSize2;
+        cout<< count[i] << endl;
     }
     answer.push_back(ref);
     answer.push_back(count);
@@ -365,7 +396,7 @@ std::vector<std::vector<double>> ProbDetermine(double L, double w, double d) {
 
 
 int main() {
-    double * answer = fLx(0.3);
+    /*double * answer = fLx(0.3);
     cout << "1: " << answer[0] << endl;
     cout << "2: " << answer[1] << endl;
     cout << "3: " << answer[2] << endl;
@@ -381,5 +412,14 @@ int main() {
     cout << "Rect Checking: " << ans1 << endl;
     //double area = AreaFunction(-1,1,-1.570696);
     //cout << "area calculation: " << area << endl;
-    gradientReturn();
+    gradientReturn();*/
+
+    std::vector<std::vector<double>> Output; 
+    Output.push_back(ProbDetermine(1,1,.1)[1]);
+    Output.push_back(ProbDetermine(1,1,.5)[1]);
+    Output.push_back(ProbDetermine(1,1,1)[1]);
+    Output.push_back(ProbDetermine(1,1,2)[1]);
+    Output.push_back(ProbDetermine(1,1,3)[1]);
+    printVectorOfVectors(Output);
+    
 }
