@@ -3,6 +3,11 @@
 #include <functional>
 #include <algorithm>
 #include <random>
+#include <fstream>
+#include <string>
+
+
+
 using namespace std; 
 
 double h = .0001;
@@ -13,6 +18,20 @@ int number = 0;
 double pi = 3.14159265359;
 int sampleSize = 1000;
 int sampleSize2= 100000;
+double w = 25;
+double v0 = 100;
+double k = w/v0;
+
+void runPythonScript(const std::string& pythonFileName) {
+    std::string command = "python " + pythonFileName;
+    int result = std::system(command.c_str());
+    if (result == 0) {
+        std::cout << "Python script executed successfully." << std::endl;
+    } else {
+        std::cerr << "Error: Failed to execute Python script." << std::endl;
+    }
+}
+
 
 void showProgressBar(int progress, int total) {
     const int barWidth = 50;
@@ -327,7 +346,7 @@ double CentDet(double L, double w, double d, double cent) {
 
 void printVectorOfVectors(const std::vector<std::vector<double>>& vec) {
     // Determine the maximum size of the inner vectors
-    size_t maxInnerSize = 0;
+    size_t maxInnerSize = 9;
     for (const auto& innerVec : vec) {
         if (innerVec.size() > maxInnerSize) {
             maxInnerSize = innerVec.size();
@@ -345,7 +364,7 @@ void printVectorOfVectors(const std::vector<std::vector<double>>& vec) {
     for (size_t row = 0; row < vec.size(); ++row) {
         std::cout << row << " ";
         for (size_t col = 0; col < vec[row].size(); ++col) {
-            std::cout << vec[row][col] << "\t";
+            std::cout << vec[row][col] << "  "<< "\t";
         }
         // Pad with empty cells if necessary
         for (size_t i = vec[row].size(); i < maxInnerSize; ++i) {
@@ -392,6 +411,129 @@ std::vector<std::vector<double>> ProbDetermine(double L, double w, double d) {
      
 }
 
+/*void writeToCSV(double num1, double num2, const string& fileName) {
+    ofstream outputFile(fileName);
+    if (!outputFile.is_open()) {
+        cout << "Error: Unable to open file " << fileName << endl;
+        return;
+    }
+    
+    outputFile << num1 << "," << num2 << endl;
+    cout << num1 << "," << num2 << endl;
+    
+    outputFile.close();
+    //cout << "Data written to " << fileName << endl;
+}*/
+
+void deleteFile(const std::string& filename) {
+    if (std::remove(filename.c_str()) != 0) {
+        std::cerr << "Error deleting file: " << filename << std::endl;
+        //return false;
+    } else {
+        std::cout << "File deleted successfully: " << filename << std::endl;
+        //return true;
+    }
+}
+
+void writeToCSV(double num1, double num2, const std::string& filename) {
+    std::ofstream file(filename, std::ios_base::app); // Open file in append mode
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return;
+    }
+    
+    file << num1 << "," << num2 << "\n"; // Write numbers in CSV format
+    file.close(); // Close the file
+}
+
+long double yPrime(long double yn, long double tn) {
+    long double e = 1;
+    long double pn = 0;
+    pn = (yn/tn)-k*pow((1+pow((yn/tn),2)),.5);
+
+    return(pn);
+
+
+}
+
+/*void plotCSV(const string& fileName) {
+    vector<double> xValues;
+    vector<double> yValues;
+
+    ifstream inputFile(fileName);
+    if (!inputFile.is_open()) {
+        cout << "Error: Unable to open file " << fileName << endl;
+        return;
+    }
+
+    string line;
+    while (getline(inputFile, line)) {
+        stringstream ss(line);
+        string token;
+        getline(ss, token, ',');
+        double x = stod(token);
+        getline(ss, token, ',');
+        double y = stod(token);
+        xValues.push_back(x);
+        yValues.push_back(y);
+    }
+
+    inputFile.close();
+
+    plt::plot(xValues, yValues);
+    plt::xlabel("X");
+    plt::ylabel("Y");
+    plt::title("Data Plot");
+    plt::show();
+}*/
+
+
+void EulerEstimate(long double y0, long double x0, long double hE, long double n) {
+    long double yn = y0;
+    long double xn = 0;
+    for(long double i = 1.0; i <= n; i = i+1) {
+        xn = x0+(hE*i);
+        yn = yn + (hE*yPrime(yn,xn));
+        long double xIN = log2(xn);
+        if(trunc(xIN)==xIN) {
+            cout << "log2(tn) = " << xIN << "   y: " << yn << endl;
+        }
+        
+    }
+}
+
+void ReverseEulerEstimate(long double y0, long double x0, long double hE, long double n) {
+    long double yn = y0;
+    long double xn = 0;
+    for(long double i = 1.0; i <= n; i = i+1) {
+        xn = x0-(hE*i);
+        yn = yn - (hE*yPrime(yn,xn));
+        long double xIN = log2(xn);
+        if(trunc(xIN)==xIN) {
+            //cout << "log2(tn) = " << xIN << "   y: " << yn << endl;
+        }
+        writeToCSV(xn,yn,"Data.csv");
+        showProgressBar(i,n);
+
+        
+    }
+    runPythonScript("Plot.py");
+}
+
+void HuenEstimate(long double y0, long double x0, long double hE, long double n) {
+    long double yn = y0;
+    long double xn = 0;
+    for(long double i = 1.0; i <= n; i = i+1) {
+        xn = x0+(hE*i);
+        yn = yn + hE*(.25)*(yPrime(yn,xn) + (3*(yPrime( (xn+((2.0*hE)/3.0)),( yn+(2.0/3.0)*hE*yPrime(yn,xn)           )       ))));
+        long double xIN = log2(xn);
+        if(trunc(xIN)==xIN) {
+            cout << "log2(tn) = " << xIN << "   y: " << yn << endl;
+        }
+        
+    }
+}
+
 
 
 
@@ -421,5 +563,10 @@ int main() {
     Output.push_back(ProbDetermine(1,1,2)[1]);
     Output.push_back(ProbDetermine(1,1,3)[1]);
     printVectorOfVectors(Output);
+
+
+    deleteFile("Data.csv");
+    ReverseEulerEstimate(0,160,.01,15999);
+    
     
 }
