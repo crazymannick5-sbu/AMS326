@@ -556,6 +556,8 @@ int main() {
     //cout << "area calculation: " << area << endl;
     gradientReturn();*/
 
+    //FIRST ASSIGNMENT HERE;
+
     std::vector<std::vector<double>> Output; 
     Output.push_back(ProbDetermine(1,1,.1)[1]);
     Output.push_back(ProbDetermine(1,1,.5)[1]);
